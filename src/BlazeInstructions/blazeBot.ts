@@ -2,41 +2,33 @@ import puppeteer from "puppeteer";
 import { delay } from "../helper/delay";
 
 const blazeWebsite = "https://blaze.com/pt/games/double";
-//rpItem  classList that we need to open and click in the element
+
+const play = [1.8, 3.6, 7.2, 14.4, 28.8]; //113,4
+
 const bot = async () => {
-  const browser = await puppeteer.launch({ headless: false, devtools: true });
-  const page = await browser.newPage();
-  await page.goto(blazeWebsite);
+	const browser = await puppeteer.launch({ headless: true, devtools: true });
+	const page = await browser.newPage();
+	await page.goto(blazeWebsite);
+	await delay(1500);
 
-  await delay(5000);
+	const elements = await page.$$(".sm-box");
+	const colors = [];
 
-  const elements = await page.$$(".sm-box");
+	for (let i = 0; i < 4; i++) {
+		const element = elements[i];
+		const classList: string = await (
+			await element.getProperty("className")
+		).jsonValue();
+		colors.push(classList.split(" ")[1]);
+	}
 
-  const colors = [];
-
-  for (let i = 0; i < elements.length; i++) {
-    const element = elements[i];
-    const classList: string = await (
-      await element.getProperty("className")
-    ).jsonValue();
-    colors.push(classList.split(" ")[1]);
-  }
-
-  const lastColors = colors.filter((_, index) => index < 4);
-  console.log("🚀 lastColors", lastColors);
-
-  const playBlack = lastColors.every((item) => item === "black");
-  const playRed = lastColors.every((item) => item === "red");
-  console.log("🚀 playBlack", playBlack);
-  console.log("🚀 playRed", playRed);
-
-  if (playBlack) {
-    console.log("black");
-  } else if (playRed) {
-    console.log("red");
-  } else {
-    console.log("no color");
-  }
+	let round = 0;
+	const playBlack = colors.every((item) => item === "red");
+	const playRed = colors.every((item) => item === "black");
+	console.clear();
+	console.log(playBlack ? "Jogar preto" : "");
+	console.log(playRed ? "Jogar vermelho" : "");
+	console.log(!playRed && !playBlack && "Não jogar");
 };
 
 export default bot;
