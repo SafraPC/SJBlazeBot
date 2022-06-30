@@ -1,5 +1,10 @@
-const app = async () => {
-	console.log("blaze cu");
+import blazeBot from "./blazeBot";
+const init = async () => {
+	try {
+		await blazeBot();
+	} catch (e) {
+		console.log(e);
+	}
 };
 
-export default app;
+export default init;
