@@ -1,0 +1,31 @@
+#HOW USE THIS DOCKER COMPOSE FILE.
+
+1 - ) Open the root folder in your terminal,
+
+2 - ) Throw the command "sudo docker-compose up"
+
+MYSQL Container will be dispatched in your terminal, you can see in command below.
+
+3 - ) Throw the command "sudo docker ps"
+
+If your container is up, its ok!
+you can use your mysql database in port 3306 using MYSQL Workbench or DBeaver.
+
+
+
+----
+
+WHEN YOU ALREADY DID THE COMMAND ABOVE AND YOU NEED TO START THE CONTAINER AGAIN.
+
+Throw the command "sudo docker ps -la" to see the hidden containers.
+
+Get the offline container id and 
+
+Throw the command "sudo docker start {container_id}
+
+
+its up now!
+
+
+create the database joining in your SGBD and put the commands in 
+blaze_bot.sql
