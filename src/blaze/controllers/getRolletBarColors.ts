@@ -4,32 +4,44 @@ type PageProps = {
 	page: Page;
 };
 
-const getRolletBarLastColors = async ({ page }: PageProps) => {
+const getRolleteColorsList = async (page: Page, repetitions?: number) => {
 	const elements = await page.$$(".sm-box");
 	const colors = [];
-	for (let i = 0; i < 4; i++) {
+	const retition = repetitions ? repetitions : elements.length;
+	for (let i = 0; i < retition; i++) {
 		const element = elements[i];
 		const classList: string = await (
 			await element.getProperty("className")
 		).jsonValue();
-		colors.push(classList.split(" ")[1]);
+		const formatClassList = classList.split(" ")[1];
+		if (formatClassList) {
+			colors.push(formatClassList);
+		}
 	}
 	return colors;
 };
 
-const verifyWhitePosition = async ({ page }: PageProps) => {
-	const elements = await page.$$(".sm-box");
-	const colors = [];
-	for (let i = 0; i < elements.length; i++) {
-		const element = elements[i];
-		const classList: string = await (
-			await element.getProperty("className")
-		).jsonValue();
-		colors.push(classList.split(" ")[1]);
-	}
+export const canPlay = async ({ page }: PageProps) => {
+	const elementClassVerifier = await page.$$(".place-bet");
 
-	const whitePosition = colors.findIndex((item) => item === "white");
-	return whitePosition + 1;
+	const element = elementClassVerifier[0];
+	const placeButton = await element.$("button");
+	const buttonText: string | undefined = await (
+		await placeButton?.getProperty("innerText")
+	)?.jsonValue();
+	return buttonText === "Começar o jogo";
 };
 
-export { getRolletBarLastColors, verifyWhitePosition };
+export const getRolleteColors = async ({ page }: PageProps) => {
+	return await getRolleteColorsList(page);
+};
+
+export const verifyWhitePosition = async ({ page }: PageProps) => {
+	return (await getRolleteColorsList(page)).findIndex(
+		(item) => item === "white"
+	);
+};
+
+export const getRolletBarLastColors = async ({ page }: PageProps) => {
+	return await getRolleteColorsList(page, 4);
+};

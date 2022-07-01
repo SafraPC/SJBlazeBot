@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { delay } from "../helper/delay";
+import { delay } from "../../helpers/delay";
 
 const blazeWebsite = "https://blaze.com/pt/games/double";
 const createPuppeteerInstance = async () => {
