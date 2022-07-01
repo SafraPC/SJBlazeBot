@@ -1,5 +1,5 @@
 import express from "express";
-import initBlazeBot from "./BlazeInstructions/index";
+import initBlazeBot from "./blaze/createBlazeInstance/index";
 const app = express();
 const port = 3000;
 

@@ -1,4 +1,4 @@
-import blazeBot from "./blazeBot";
+import blazeBot from "./app";
 const init = async () => {
 	try {
 		await blazeBot();
