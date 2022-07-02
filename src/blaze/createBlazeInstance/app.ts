@@ -5,27 +5,34 @@ import {
 } from "../controllers/getRolletBarColors";
 import { createPuppeteerInstance } from "./createPuppeteerInstance";
 
-const totalPlaytime = [2, 4, 8, 16, 32];
+// const totalPlaytime = [2, 4, 8, 16, 32];
 
 const bot = async () => {
 	const { page } = await createPuppeteerInstance();
-	let rollete = await getRolleteColors({ page });
 	let whiteSurplusPosition = 20;
-	let whitePosition = 0;
+	let lastCanPlay = false;
+
+	const playWhite = ({
+		canPlayNow,
+		whitePosition,
+	}: {
+		canPlayNow: boolean;
+		whitePosition: number;
+	}) => {
+		if (canPlayNow && lastCanPlay !== canPlayNow && whitePosition === -1) {
+			whiteSurplusPosition++;
+			console.log(whiteSurplusPosition);
+		} else {
+			whiteSurplusPosition = 20;
+			console.log(whitePosition + 1);
+		}
+	};
+
 	const isPlaying = setInterval(async () => {
 		console.clear();
-		console.log(await canPlay({ page }));
-		// const newRollete = await getRolleteColors({ page });
-		// if (JSON.stringify(rollete) === JSON.stringify(newRollete)) {
-		// 	console.log("mesmo");
-		// } else {
-		// 	console.log("mudou");
-		// 	rollete = newRollete;
-		// }
-
-		// const whiteIndex = await verifyWhitePosition({ page });
-		// const playBlack = rollete.every((item) => item === "red");
-		// const playRed = rollete.every((item) => item === "black");
+		const whitePosition = await verifyWhitePosition({ page });
+		const canPlayNow = await canPlay({ page });
+		playWhite({ canPlayNow, whitePosition });
 	}, 3000);
 };
 
