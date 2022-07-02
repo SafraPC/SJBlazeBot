@@ -54,6 +54,10 @@ const bot = async (connection: Connection) => {
       } else {
         // TODO: add the sequence in to the database
         if (currentColor.sequence > 0) {
+          connection.query(
+            "INSERT INTO `COLORS` (`repeat_time`, `color`, initial_date) VALUES (?, ?, ?)",
+            [currentColor.sequence, currentColor.name, new Date()]
+          );
           console.log(
             `saving past color sequence: ${currentColor.name} - ${currentColor.sequence}`
           );
