@@ -1,7 +1,9 @@
+import { Connection } from "mysql2/typings/mysql";
 import blazeBot from "./app";
-const init = async () => {
+
+const init = async (connection: Connection) => {
 	try {
-		await blazeBot();
+		await blazeBot(connection);
 	} catch (e) {
 		console.log(e);
 	}
