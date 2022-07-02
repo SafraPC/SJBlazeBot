@@ -1,13 +1,13 @@
 import {
 	canPlay,
-	getRolleteColors,
 	verifyWhitePosition,
 } from "../controllers/getRolletBarColors";
 import { createPuppeteerInstance } from "./createPuppeteerInstance";
+import { Connection } from "mysql2/typings/mysql";
 
 // const totalPlaytime = [2, 4, 8, 16, 32];
 
-const bot = async () => {
+const bot = async (connection: Connection) => {
 	const { page } = await createPuppeteerInstance();
 	let whiteSurplusPosition = 20;
 	let lastCanPlay = false;
@@ -23,6 +23,7 @@ const bot = async () => {
 			whiteSurplusPosition++;
 			console.log(whiteSurplusPosition);
 		} else {
+			//MYSQL QUERY
 			whiteSurplusPosition = 20;
 			console.log(whitePosition + 1);
 		}

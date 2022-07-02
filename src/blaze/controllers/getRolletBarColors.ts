@@ -41,7 +41,3 @@ export const verifyWhitePosition = async ({ page }: PageProps) => {
 		(item) => item === "white"
 	);
 };
-
-export const getRolletBarLastColors = async ({ page }: PageProps) => {
-	return await getRolleteColorsList(page, 4);
-};
