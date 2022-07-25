@@ -2,7 +2,6 @@ import {
     canPlay,
     Colors,
     getRolleteColors,
-    verifyWhitePosition,
 } from '../controllers/getRolletBarColors'
 import { createPuppeteerInstance } from './createPuppeteerInstance'
 import { Connection } from 'mysql2/typings/mysql'
@@ -16,53 +15,50 @@ interface CurrentColorProps {
 
 const bot = async (connection: Connection) => {
     const { page } = await createPuppeteerInstance()
-    let whiteSurplusPosition = 20
+    let bucket = 110
     const currentColor: CurrentColorProps = {
         sequence: 0,
     }
-    let blockRenderer = false
-
-    const playWhite = ({
-        canPlayNow,
-        whitePosition,
-    }: {
-        canPlayNow: boolean
-        whitePosition: number
-    }) => {
-        if (canPlayNow && !blockRenderer) {
-            if (whitePosition === -1) {
-                whiteSurplusPosition++
-                console.log(whiteSurplusPosition)
-            } else {
-                if (whiteSurplusPosition > 20) {
-                    connection.query(
-                        'INSERT INTO `WHITES` (`squence`, initial_date) VALUES (?, ?)',
-                        [whiteSurplusPosition, new Date()]
-                    )
-
-                    console.log(
-                        `saving white interval: ${whiteSurplusPosition}`
-                    )
-                }
-                whiteSurplusPosition = 20
-                console.log(whitePosition + 1)
-            }
-        }
-    }
+    let blazeLetsPlay = false,
+        alreadyPlayed = false,
+        apostedColor = ''
 
     const currentColorSequence = async ({
         canPlayNow,
     }: {
         canPlayNow: boolean
     }) => {
-        if (canPlayNow && !blockRenderer) {
+        if (blazeLetsPlay) {
             const colors = await getRolleteColors({ page })
-            const lastCorlor = colors[0]
+            const lastColor = colors[0]
+            console.log(currentColor, lastColor)
+            if (currentColor.sequence >= 2 && !alreadyPlayed) {
+                if (lastColor === 'black') {
+                    apostedColor = 'red'
+                } else if (lastColor === 'red') {
+                    apostedColor = 'black'
+                }
+                bucket -= 2
+                alreadyPlayed = true
+                console.log('jogou')
+            }
+        } else if (canPlayNow && !blazeLetsPlay) {
+            const colors = await getRolleteColors({ page })
+            const lastColor = colors[0]
 
-            if (lastCorlor === currentColor.name) {
+            if (alreadyPlayed) {
+                if (apostedColor === lastColor) {
+                    bucket = +2
+                    console.log('ganhou')
+                } else {
+                    console.log('perdeu')
+                }
+                alreadyPlayed = false
+            }
+
+            if (lastColor === currentColor.name) {
                 currentColor.sequence++
             } else {
-                // TODO: add the sequence in to the database
                 if (currentColor.sequence > 0) {
                     connection.query(
                         'INSERT INTO `COLORS` (`repeat_time`, `color`, initial_date) VALUES (?, ?, ?)',
@@ -73,24 +69,15 @@ const bot = async (connection: Connection) => {
                     )
                 }
                 currentColor.sequence = 1
-                currentColor.name = lastCorlor
+                currentColor.name = lastColor
             }
-
-            console.log(currentColor)
         }
     }
 
-    const isPlaying = setInterval(async () => {
-        const whitePosition = await verifyWhitePosition({ page })
+    setInterval(async () => {
         const canPlayNow = await canPlay({ page })
         currentColorSequence({ canPlayNow })
-        playWhite({ canPlayNow, whitePosition })
-
-        if (canPlayNow) {
-            blockRenderer = true
-        } else {
-            blockRenderer = false
-        }
+        blazeLetsPlay = canPlayNow
     }, 3000)
 }
 
